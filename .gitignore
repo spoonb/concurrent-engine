@@ -4,10 +4,11 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
-.idea/
-*.iws
-*.iml
-*.ipr
+# ===== idea ignore =====
+.idea/*
+# ===== idea accept =====
+!.idea/runConfigurations/
+!.idea/runConfigurations/*.xml
 
 ### Eclipse ###
 .apt_generated

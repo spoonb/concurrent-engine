@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TaskServer-Day1" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.spoonb.day1.TaskServer" />
+    <module name="concurrent-engine" />
+    <option name="VM_PARAMETERS" value="-Xms128m -Xmx128m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./dump.hprof -Xlog:gc*" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.spoonb.day1.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
