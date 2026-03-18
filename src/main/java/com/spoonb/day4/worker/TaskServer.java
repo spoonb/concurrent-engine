@@ -1,4 +1,4 @@
-package com.spoonb.day3;
+package com.spoonb.day4.worker;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -46,7 +46,9 @@ public class TaskServer {
     }
 
     static String handle(String line) throws InterruptedException {
-        Thread.sleep(2000);
+        if ("sleep 2000".equals(line)) {
+            Thread.sleep(2000);
+        }
         return String.format("handle %s", line);
     }
 
@@ -61,13 +63,18 @@ public class TaskServer {
         public void run() {
             long n = REQ_COUNT.incrementAndGet();
             try (Socket s = socket;
-                 BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8))) {
+                 BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
+                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8))) {
 
                 String line;
                 while ((line = in.readLine()) != null) {
                     boolean offer = TaskServer.QUEUE.offer(new Task(s, line));
                     if (!offer) {
-                        System.out.println("Server is busy!!!");
+                        System.out.println(String.format("%s -> Server is busy!!!", Thread.currentThread().getName()));
+                        out.write(String.format("%s -> Server is busy!!!", Thread.currentThread().getName()));
+                        out.write("\n");
+                        out.flush();
+                        s.close();
                     }
                 }
                 if (n % 1000 == 0) {
@@ -86,6 +93,13 @@ public class TaskServer {
     static class Worker implements Runnable {
         @Override
         public void run() {
+//            synchronized (LEAK) {
+//                if (LEAK.size() >= MAX_SIZE) { // 拒绝
+//                    System.out.println("LEAK is busy!!!");
+//                } else {
+//                    LEAK.push(new byte[1024 * 1024 * 10]);
+//                }
+//            }
             while (true) {
                 try {
                     Task take = TaskServer.QUEUE.take();
@@ -95,13 +109,6 @@ public class TaskServer {
                     out.write(handle);
                     out.write("\n");
                     out.flush();
-                    synchronized (LEAK) {
-                        if (LEAK.size() >= MAX_SIZE) { // 拒绝
-                            System.out.println("LEAK is busy!!!");
-                        } else {
-                            LEAK.push(new byte[1024 * 1024 * 10]);
-                        }
-                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
